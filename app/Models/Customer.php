@@ -27,5 +27,12 @@ class Customer extends Authenticatable
     {
         return $this->belongsToMany(Product::class, 'ec_wish_lists', 'customer_id', 'product_id')->withTimestamps();
     }
+    public function reviews(){
+
+        return $this->hasMany(Review::class,'customer_id');
+
+    }
+  
     
+
 }

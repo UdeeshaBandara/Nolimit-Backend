@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\OTPConfirmRule;
+use App\Rules\ReviewDeleteRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class CustomerRegisterRequest extends FormRequest
+class ReviewRequest extends FormRequest
 {
 
     /**
@@ -20,13 +20,11 @@ class CustomerRegisterRequest extends FormRequest
 
         throw new HttpResponseException(response(["status" => false, "validation_error" => $validator->errors()->first()], 200));
     }
-
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-
     public function authorize()
     {
         return true;
@@ -39,18 +37,28 @@ class CustomerRegisterRequest extends FormRequest
      */
     public function rules()
     {
-        if (strpos(request()->requestUri, 'customer/confirm-otp')) {
-            
+        if (request()->method() == "POST") {
             return [
-                'phone' => ['bail', 'required', 'numeric','exists:ec_customers,phone'],
-                'otp_no' => ['bail', 'required', 'numeric','digits:6', new OTPConfirmRule()]
+                'product_id' => 'bail|required|numeric|exists:ec_products,id|unique:ec_reviews,product_id,product_id,id,customer_id,' . request()->user()->id,
+                'comment' => 'bail|required|max:255',
+                'rating' => 'bail|required|numeric',
 
             ];
-        } else
+        }else if(request()->method()=="DELETE"){
             return [
-                'name' => 'bail|required|max:255',
-                'email' => 'bail|required|unique:ec_customers,email|max:255|email',
-                'phone' => 'bail|required|unique:ec_customers,phone',
+                'product_id' => 'bail|required|numeric',
+                'product_id' => new ReviewDeleteRule()
+               
+
             ];
+
+        }
+    }
+    public function messages()
+    {
+
+        return [
+            'unique' => 'You already reviewed this product'
+        ];
     }
 }

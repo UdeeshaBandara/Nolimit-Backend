@@ -14,11 +14,10 @@ class CustomerController extends Controller
 {
     public function index(Request $request)
     {
-        $response = $request->user();
-        // $response = $response->makeHidden(['otp_no', 'remember_token', 'created_at', 'updated_at']);
+
 
         return ([
-            'customer' => $response
+            'customer' => $request->user()
 
         ]);
     }
@@ -67,31 +66,16 @@ class CustomerController extends Controller
             return response(["status" => true, "customer" => $customer, "otp_no" => $otp], 200);
         }
     }
-    public function confrimOTP(Request $request)
+    public function confrimOTP(CustomerRegisterRequest $request)
     {
 
-        $validator = Validator::make($request->all(), [
-            'phone' => 'bail|required|numeric|exists:ec_customers,phone',
-            'otp_no' => 'bail|required|numeric|digits:6'
-        ]);
-        if ($validator->fails()) {
-            return response(["status" => false, "validation_error" => $validator->errors()->first()], 200);
-        } else {
+        $data = $request->validated();
 
-            $customer = Customer::where('phone', $request->input('phone'))->first();
-            if ($request->input('otp_no') == $customer->otp_no) {
-                $authToken = "";
-                
-                if ($customer->tokens()->count() == 0)
-                    $authToken = $customer->createToken($customer->name)->plainTextToken;
-                else {
-                    $customer->tokens()->where('tokenable_id', $customer->id)->delete();
-                    $authToken = $customer->createToken($customer->name)->plainTextToken;
-                }
-                return response(["status" => true, "customer" => $customer, "token" => $authToken], 200);
-            } else {
-                return response(["status" => false, "validation_error" => "Invalid OTP code"], 200);
-            }
-        }
+        $customer = Customer::where('phone', $data['phone'])->first();
+
+        $customer->tokens()->delete();
+
+        return response(["status" => true, "customer" => $customer, "token" => $customer->createToken($customer->name)->plainTextToken], 200);
+        
     }
 }

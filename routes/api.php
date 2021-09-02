@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SanctumController;
 use App\Http\Controllers\WishListController;
 use Illuminate\Http\Request;
@@ -18,17 +20,29 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/customer', [CustomerController::class, 'store']);
-Route::post('/customer/login', [CustomerController::class, 'login']);
-Route::post('/customer/confirm-otp', [CustomerController::class, 'confrimOTP']);
-Route::post('/customer/resend-otp', [CustomerController::class, 'login']);
+//Customer registration routes
+Route::group(['prefix' => 'customer'], function () {
 
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/flash-sale', [ProductController::class, 'getFlashSale']);
-Route::get('/products/featured', [ProductController::class, 'getFeaturedProduct']);
-Route::get('/products/new-arrivals', [ProductController::class, 'getNewArrivals']);
-Route::get('/products/{id}', [ProductController::class, 'getOneProduct']);
+    Route::post('/', [CustomerController::class, 'store']);
+    Route::post('/login', [CustomerController::class, 'login']);
+    Route::post('/confirm-otp', [CustomerController::class, 'confrimOTP']);
+    Route::post('/resend-otp', [CustomerController::class, 'login']);
 
+
+});
+
+//Home screen routes
+Route::get('/home-banners', [MediaController::class, 'getHomeBanners']);
+
+Route::group(['prefix' => 'products'], function () {
+
+    Route::get('/', [ProductController::class, 'index']);
+    Route::get('/flash-sale', [ProductController::class, 'getFlashSale']);
+    Route::get('/featured', [ProductController::class, 'getFeaturedProduct']);
+    Route::get('/new-arrivals', [ProductController::class, 'getNewArrivals']);
+    Route::get('/{id}', [ProductController::class, 'getOneProduct']);
+
+});
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -42,8 +56,13 @@ Route::group(['prefix' => 'wish-list', 'middleware' => ['auth:sanctum']], functi
     Route::post('/', [WishListController::class, 'store']);
     Route::delete('/', [WishListController::class, 'destroy']);
 });
+Route::group(['prefix' => 'reviews', 'middleware' => ['auth:sanctum']], function () {
+
+    Route::get('/', [ReviewController::class, 'index']);
+    Route::post('/', [ReviewController::class, 'store']);
+    Route::delete('/', [ReviewController::class, 'destory']);
+});
 
 
 
 
-Route::get('/login', [SanctumController::class, 'indicate'])->name('login');

@@ -21,6 +21,12 @@ class Product extends Model
         'pivot'
     ];
 
+
+    protected $casts = [
+        'images' => 'array'
+    ];
+
+
     public function productCollection()
     {
         return $this->belongsToMany(ProductCollection::class, 'ec_product_collection_products', 'product_id', 'product_collection_id');
@@ -29,4 +35,10 @@ class Product extends Model
     {
         return $this->belongsToMany(Customer::class, 'ec_wish_lists', 'product_id', 'customer_id')->withTimestamps();
     }
+    public function reviews(){
+
+        return $this->hasMany(Review::class,  'product_id');
+
+    }
+  
 }
