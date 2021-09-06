@@ -12,6 +12,7 @@ class Product extends Model
 
     protected $guarded = [];
 
+   
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -35,10 +36,17 @@ class Product extends Model
     {
         return $this->belongsToMany(Customer::class, 'ec_wish_lists', 'product_id', 'customer_id')->withTimestamps();
     }
-    public function reviews(){
+    public function reviews()
+    {
 
         return $this->hasMany(Review::class,  'product_id');
-
     }
-  
+
+
+    public function getIsReviewedAttribute()
+    {
+
+        return $this->reviews()
+            ->exists();
+    }
 }

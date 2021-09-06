@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CustomerAddressController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProductController;
@@ -61,6 +62,15 @@ Route::group(['prefix' => 'reviews', 'middleware' => ['auth:sanctum']], function
     Route::get('/', [ReviewController::class, 'index']);
     Route::post('/', [ReviewController::class, 'store']);
     Route::delete('/', [ReviewController::class, 'destory']);
+});
+Route::group(['prefix' => 'address', 'middleware' => ['auth:sanctum']], function () {
+
+    Route::get('/', [CustomerAddressController::class, 'index']);
+    Route::post('/', [CustomerAddressController::class, 'store']);
+    Route::delete('/', [CustomerAddressController::class, 'destory']);
+    Route::put('/', [CustomerAddressController::class, 'patch']);
+
+    Route::get('/cities', [CustomerAddressController::class, 'getCities']);
 });
 
 
