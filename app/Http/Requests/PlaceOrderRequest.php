@@ -2,15 +2,13 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\ReviewDeleteRule;
-use App\Rules\ReviewStoreRule;
+use App\Rules\OrderProductRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ReviewRequest extends FormRequest
+class PlaceOrderRequest extends FormRequest
 {
-
     /**
      * Failed validation disable redirect
      *
@@ -38,30 +36,22 @@ class ReviewRequest extends FormRequest
      */
     public function rules()
     {
-        if (request()->method() == "POST") {
-            return [
-               
-                'product_id' => ['bail','required','numeric','exists:ec_products,id',new ReviewStoreRule(),'unique:ec_reviews,product_id,product_id,id,customer_id,' . request()->user()->id ],
-              
-                'comment' => 'bail|required|max:255',
-                'rating' => 'bail|required|numeric',
+        return [
+            'ship_address_id' => ['bail', 'required', 'numeric','exists:ec_customer_addresses,id'],
+            'products' => ['bail', 'required'  ],
+            'products.*.product_id' => ['bail', 'required', 'numeric','exists:ec_products,id',new OrderProductRule() ],
+            'products.*.qty' => ['bail', 'required', 'numeric'],
+            // 'products' => ['bail', 'required', new OrderProductRule()],
+            'billing_address_id' => ['bail', 'required', 'numeric','exists:ec_customer_addresses,id'],
+            
 
-            ];
-        }else if(request()->method()=="DELETE"){
-            return [
-                'product_id' => 'bail|required|numeric',
-                'product_id' => new ReviewDeleteRule()
-               
-
-            ];
-
-        }
+        ];
     }
     public function messages()
     {
 
         return [
-            'unique' => 'You already reviewed this product'
+            'products.*.product_id.exists' => 'Invalid product id - :input' //use :attribute to return field name
         ];
     }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\CustomerAddressController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SanctumController;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Customer registration routes
+//Customer registration/info routes
 Route::group(['prefix' => 'customer'], function () {
 
     Route::post('/', [CustomerController::class, 'store']);
@@ -29,6 +30,10 @@ Route::group(['prefix' => 'customer'], function () {
     Route::post('/confirm-otp', [CustomerController::class, 'confrimOTP']);
     Route::post('/resend-otp', [CustomerController::class, 'login']);
 
+    Route::group(['middleware' => ['auth:sanctum']], function () {
+        Route::get('/', [CustomerController::class, 'index']);
+        Route::post('/validate-password', [CustomerController::class, 'validatePassword']);
+    });
 
 });
 
@@ -43,12 +48,6 @@ Route::group(['prefix' => 'products'], function () {
     Route::get('/new-arrivals', [ProductController::class, 'getNewArrivals']);
     Route::get('/{id}', [ProductController::class, 'getOneProduct']);
 
-});
-
-
-Route::group(['middleware' => ['auth:sanctum']], function () {
-
-    Route::get('/customer', [CustomerController::class, 'index']);
 });
 
 Route::group(['prefix' => 'wish-list', 'middleware' => ['auth:sanctum']], function () {
@@ -69,8 +68,16 @@ Route::group(['prefix' => 'address', 'middleware' => ['auth:sanctum']], function
     Route::post('/', [CustomerAddressController::class, 'store']);
     Route::delete('/', [CustomerAddressController::class, 'destory']);
     Route::put('/', [CustomerAddressController::class, 'patch']);
-
     Route::get('/cities', [CustomerAddressController::class, 'getCities']);
+});
+
+Route::group(['prefix' => 'order', 'middleware' => ['auth:sanctum']], function () {
+
+    // Route::get('/', [CustomerAddressController::class, 'index']);
+    Route::post('/', [OrderController::class, 'store']);
+    // Route::delete('/', [CustomerAddressController::class, 'destory']);
+    // Route::put('/', [CustomerAddressController::class, 'patch']);
+    // Route::get('/cities', [CustomerAddressController::class, 'getCities']);
 });
 
 

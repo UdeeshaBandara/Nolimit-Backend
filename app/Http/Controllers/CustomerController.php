@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use Illuminate\Support\Carbon;
-
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\CustomerRegisterRequest;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +38,7 @@ class CustomerController extends Controller
             array(
                 'name'     =>   $data['name'],
                 'phone'   =>   $data['phone'],
+                'password'   =>   Hash::make($data['phone']),
                 'email'   =>   $data['email'],
                 'created_at'   =>  Carbon::now(),
                 'updated_at'   =>   Carbon::now(),
@@ -76,6 +77,13 @@ class CustomerController extends Controller
         $customer->tokens()->delete();
 
         return response(["status" => true, "customer" => $customer, "token" => $customer->createToken($customer->name)->plainTextToken], 200);
+    }
+    public function validatePassword(Request $request)
+    {
         
+        if (Hash::check($request->input('password'), Customer::where('id',$request->user()->id)->get()->pluck('password')[0]))
+            return response(["is_valid_password" => true], 200);
+        else
+            return response(["is_valid_password" => false], 200);
     }
 }

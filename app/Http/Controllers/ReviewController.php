@@ -29,9 +29,10 @@ class ReviewController extends Controller
         function ($query) use ($request)  {
            
             $query->where('customer_id', $request->user()->id);
-        }])->get()->each(function ($items) {
+        }])->get()->each(function ($items) use ($request) {
 
             $items->products->append('is_reviewed');
+           
         });
 
         foreach ($orders as $order)

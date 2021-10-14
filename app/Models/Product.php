@@ -41,12 +41,25 @@ class Product extends Model
 
         return $this->hasMany(Review::class,  'product_id');
     }
-
-
     public function getIsReviewedAttribute()
     {
 
-        return $this->reviews()
+        return $this->reviews()->where('customer_id', request()->user()->id)
             ->exists();
+    }
+    public function isOutOfStock($qty = null)
+    {
+        
+        if (!$this->with_storehouse_management) {
+           
+            return false;
+        }
+
+        if ($qty != null && $qty > $this->quantity) {
+           
+            return true;
+        }
+
+        return $this->quantity <= 0 && !$this->allow_checkout_when_out_of_stock;
     }
 }
