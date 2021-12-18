@@ -26,7 +26,8 @@ class CustomerController extends Controller
 
         $data = $request->validated();
 
-        $otp = rand(100000, 999999);
+        // $otp = rand(100000, 999999);
+        $otp = 000000;
 
         $customer = new Customer();
 
@@ -60,7 +61,8 @@ class CustomerController extends Controller
             return response(["status" => false, "validation_error" => $validator->errors()->first()], 200);
         } else {
 
-            $otp = rand(100000, 999999);
+            // $otp = rand(100000, 999999);
+            $otp = 000000;
             $customer = Customer::where('phone', $request->input('phone'))->first();
             $customer->otp_no = $otp;
             $customer->update();
@@ -80,8 +82,8 @@ class CustomerController extends Controller
     }
     public function validatePassword(Request $request)
     {
-        
-        if (Hash::check($request->input('password'), Customer::where('id',$request->user()->id)->get()->pluck('password')[0]))
+
+        if (Hash::check($request->input('password'), Customer::where('id', $request->user()->id)->get()->pluck('password')[0]))
             return response(["is_valid_password" => true], 200);
         else
             return response(["is_valid_password" => false], 200);

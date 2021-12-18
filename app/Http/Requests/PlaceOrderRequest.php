@@ -39,11 +39,13 @@ class PlaceOrderRequest extends FormRequest
         return [
             'ship_address_id' => ['bail', 'required', 'numeric','exists:ec_customer_addresses,id'],
             'products' => ['bail', 'required'  ],
-            'products.*.product_id' => ['bail', 'required', 'numeric','exists:ec_products,id',new OrderProductRule() ],
+            'products.*.product_id' => ['bail', 'required', 'numeric','exists:ec_products,id',new OrderProductRule()],
+            // 
             'products.*.qty' => ['bail', 'required', 'numeric'],
-            // 'products' => ['bail', 'required', new OrderProductRule()],
-            'billing_address_id' => ['bail', 'required', 'numeric','exists:ec_customer_addresses,id'],
             
+            'ship_address_id' => ['bail', 'required', 'numeric','exists:ec_customer_addresses,id'],
+            'billing_address_id' => ['bail', 'required', 'numeric','exists:ec_customer_addresses,id'],
+            // 'products.*.product_id' => [],
 
         ];
     }
@@ -51,6 +53,7 @@ class PlaceOrderRequest extends FormRequest
     {
 
         return [
+            'products.*.product_id.numeric' => 'Product id should be a number - :input',
             'products.*.product_id.exists' => 'Invalid product id - :input' //use :attribute to return field name
         ];
     }

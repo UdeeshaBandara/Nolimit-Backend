@@ -38,11 +38,11 @@ class AddressRequest extends FormRequest
     {
         if (request()->method() == "POST") {
             return [
+                'name' => 'bail|required|max:255',
+                'phone' => 'bail|required|numeric',
+                'email' => 'bail|required|email',
                 'address' => 'bail|required|max:255',
-                'city' => 'bail|required|max:255',
-                'state' => 'bail|required|max:255',
-                'country' => 'bail|required|max:255',
-                'is_default' => 'bail|required|numeric',
+                'city' => 'bail|required|max:255',  
 
             ];
         }else if(request()->method()=="DELETE"){

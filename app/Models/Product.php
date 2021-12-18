@@ -12,7 +12,10 @@ class Product extends Model
 
     protected $guarded = [];
 
-   
+    protected $attributes = [
+        'options' => 'default value'
+    ];
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -49,17 +52,35 @@ class Product extends Model
     }
     public function isOutOfStock($qty = null)
     {
-        
+
         if (!$this->with_storehouse_management) {
-           
+
             return false;
         }
 
         if ($qty != null && $qty > $this->quantity) {
-           
+
             return true;
         }
 
         return $this->quantity <= 0 && !$this->allow_checkout_when_out_of_stock;
+    }
+    public function productCategory()
+    {
+        return $this->belongsToMany(Category::class, 'ec_product_category_product', 'product_id', 'category_id');
+    }
+
+
+    public function attributes()
+    {
+
+         
+        return $this->hasMany(ProductWithAttribute::class);
+    }
+    public function getIsWishListedAttribute()
+    {
+
+        return $this->wishListCustomers()->where('customer_id', request()->user()->id)
+            ->exists();
     }
 }

@@ -12,7 +12,7 @@ class WishListController extends Controller
 
     public function index(Request $request)
     {
-
+        
         $result = Customer::find($request->user()->id)->wishListProducts()->get();
         if ($result->isEmpty())
             return response(["available" => false], 200);

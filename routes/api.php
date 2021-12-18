@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerAddressController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MediaController;
@@ -34,7 +35,6 @@ Route::group(['prefix' => 'customer'], function () {
         Route::get('/', [CustomerController::class, 'index']);
         Route::post('/validate-password', [CustomerController::class, 'validatePassword']);
     });
-
 });
 
 //Home screen routes
@@ -47,7 +47,15 @@ Route::group(['prefix' => 'products'], function () {
     Route::get('/featured', [ProductController::class, 'getFeaturedProduct']);
     Route::get('/new-arrivals', [ProductController::class, 'getNewArrivals']);
     Route::get('/{id}', [ProductController::class, 'getOneProduct']);
+});
+Route::group(['prefix' => 'products', 'middleware' => ['skipAuth', 'auth:sanctum']], function () {
 
+    Route::get('/{id}', [ProductController::class, 'getOneProduct']);
+});
+Route::group(['prefix' => 'category'], function () {
+
+    Route::get('/', [CategoryController::class, 'index']);
+    Route::get('/{categorySlug}', [CategoryController::class, 'getProductByCategory']);
 });
 
 Route::group(['prefix' => 'wish-list', 'middleware' => ['auth:sanctum']], function () {
@@ -62,13 +70,16 @@ Route::group(['prefix' => 'reviews', 'middleware' => ['auth:sanctum']], function
     Route::post('/', [ReviewController::class, 'store']);
     Route::delete('/', [ReviewController::class, 'destory']);
 });
+
+Route::post('address/cities', [CustomerAddressController::class, 'getCities']);
+
+
 Route::group(['prefix' => 'address', 'middleware' => ['auth:sanctum']], function () {
 
     Route::get('/', [CustomerAddressController::class, 'index']);
     Route::post('/', [CustomerAddressController::class, 'store']);
     Route::delete('/', [CustomerAddressController::class, 'destory']);
     Route::put('/', [CustomerAddressController::class, 'patch']);
-    Route::get('/cities', [CustomerAddressController::class, 'getCities']);
 });
 
 Route::group(['prefix' => 'order', 'middleware' => ['auth:sanctum']], function () {
@@ -79,7 +90,3 @@ Route::group(['prefix' => 'order', 'middleware' => ['auth:sanctum']], function (
     // Route::put('/', [CustomerAddressController::class, 'patch']);
     // Route::get('/cities', [CustomerAddressController::class, 'getCities']);
 });
-
-
-
-

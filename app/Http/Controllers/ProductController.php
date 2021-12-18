@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductAttribute;
+use App\Models\ProductAttributeSet;
 use App\Models\ProductCollection;
+use App\Models\ProductWithAttribute;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -17,11 +20,38 @@ class ProductController extends Controller
 
     public function getOneProduct($id)
     {
-        $result = Product::find($id);
+
+
+        if (request()->user() == null) {
+            $result = Product::where('id', $id)->with(['attributes.sizeAttribute' => function ($query) {
+
+                $query->where('attribute_set_id', 2);
+            }])->get()->toArray();
+
+            if ($result != null)
+                $result[0] += ['is_wish_listed' => false];
+        } else
+
+            $result = Product::where('id', $id)->with(['attributes.sizeAttribute' => function ($query) {
+
+                $query->where('attribute_set_id', 2);
+            }])->get()->each(function ($items) {
+
+                $items->append('is_wish_listed');
+            })->toArray();
+
+
         if ($result == null)
             return response(["available" => false], 200);
-        else
+
+        else {
+
+            foreach ($result[0]['attributes'] as  $key => $value)
+                if (is_null($value['size_attribute']))
+                    unset($result[0]['attributes'][$key]);
+
             return response(["available" => true, "product" =>  $result], 200);
+        }
     }
 
     public function getFlashSale()
@@ -58,6 +88,4 @@ class ProductController extends Controller
         else
             return response(["available" => true, "products" =>  $result], 200);
     }
-
-    
 }

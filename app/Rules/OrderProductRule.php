@@ -27,23 +27,31 @@ class OrderProductRule implements Rule
      */
     public function passes($attribute, $value)
     {
-
+        $outofstockList = array();
         foreach (request()->input('products', array()) as $cartItem) {
 
-           $product = Product::find( $cartItem['product_id']);
-           if (!$product->isOutOfStock($cartItem['qty'])) {
-           
-           
-           
-                $this->error_message = 'Product out of stock'  ;
-                return false;
+            $product = Product::find($cartItem['product_id']);
+            if (!$product->isOutOfStock($cartItem['qty'])) {
 
+                $this->error_message = 'Product out of stock - id : '.$cartItem['product_id'];
+                return false;
+                //     $weight += ($product->weight * $cartItem['qty']);
+
+                // if ($product) {
+                //     $rawTotal += ($cartItem['qty'] * ($product->priceTax == 0 ? $product->price : $product->priceTax));
+                // }
+
+
+                // $this->error_message = (string)$outofstockList ;
+
+
+            } else {
+              
             }
         }
-            // if (){
-            // $this->error_message = 'You don\'t have any reviews to delete';
-            // return false;
+       
         
+
     }
 
     /**
@@ -51,7 +59,7 @@ class OrderProductRule implements Rule
      *
      * @return string
      */
-    public function message()
+    public function  message()
     {
         return $this->error_message;
     }

@@ -56,17 +56,17 @@ class CustomerAddressController extends Controller
     public function patch(AddressRequest $addressRequest)
     {
         $data = $addressRequest->validated();
-        $address =   CustomerAddress::find( $data['id']);
-    
-        $address->name = '';
-        $address->email = '';
-        $address->phone = '';
+        $address =   CustomerAddress::find($data['id']);
+
+        $address->name = $data['name'];
+        $address->email = $data['email'];
+        $address->phone = $data['phone'];
         $address->address = $data['address'];
         $address->city = $data['city'];
-        $address->state = $data['state'];
-        $address->country = $data['country'];
+        $address->state = '';
+        $address->country = '';
         $address->customer_id = $addressRequest->user()->id;
-        $address->is_default = $data['is_default'];
+        $address->is_default = '0';
 
 
         $status =  $address->save();
@@ -76,10 +76,10 @@ class CustomerAddressController extends Controller
         else
             return response(["status" => $status], 200);
     }
-    public function getCities()
+    public function getCities(Request $request)
     {
 
-        $states = State::all();
+        $states = State::where("description", "like", '%' . $request->input('city') . '%')->get();
 
         if ($states->isEmpty())
             return response(["available" => false], 200);
