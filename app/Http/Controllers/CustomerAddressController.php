@@ -26,15 +26,16 @@ class CustomerAddressController extends Controller
     {
         $data = $addressRequest->validated();
         $address =  new CustomerAddress();
-        $address->name = '';
-        $address->email = '';
-        $address->phone = '';
+        
+        $address->name = $data['name'];
+        $address->email = $data['email'];
+        $address->phone = $data['phone'];
         $address->address = $data['address'];
         $address->city = $data['city'];
-        $address->state = $data['state'];
-        $address->country = $data['country'];
+        $address->state = '';
+        $address->country = '';
         $address->customer_id = $addressRequest->user()->id;
-        $address->is_default = $data['is_default'];
+        $address->is_default = '0';
 
 
         $status =  $address->save();

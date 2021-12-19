@@ -19,10 +19,10 @@ class ProductWithAttribute extends Model
     ];
 
  
-    public function sizeAttribute()
+    public function sizeDetails()
     {
 
-        return $this->hasOne(ProductAttribute::class,'id');
+        return $this->hasOne(ProductAttribute::class,'id','attribute_id');
     }
     
    

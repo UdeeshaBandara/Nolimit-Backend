@@ -27,7 +27,7 @@ class CustomerController extends Controller
         $data = $request->validated();
 
         // $otp = rand(100000, 999999);
-        $otp = 000000;
+        $otp = '000000';
 
         $customer = new Customer();
 

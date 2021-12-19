@@ -71,16 +71,20 @@ class Product extends Model
     }
 
 
-    public function attributes()
+     
+    public function sizes()
     {
-
-         
-        return $this->hasMany(ProductWithAttribute::class);
+        // return $this->hasMany(ProductWithAttributeSet::class,'product_id');
+        return $this->hasMany(ProductWithAttribute::class,'product_id');
+        
     }
+    
+    
     public function getIsWishListedAttribute()
     {
 
         return $this->wishListCustomers()->where('customer_id', request()->user()->id)
             ->exists();
     }
+    
 }

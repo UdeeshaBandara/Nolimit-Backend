@@ -14,5 +14,6 @@ class ProductAttribute extends Model
     protected $guarded = [];
 
 
+   
     
 }

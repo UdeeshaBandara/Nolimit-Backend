@@ -7,7 +7,9 @@ use App\Models\ProductAttribute;
 use App\Models\ProductAttributeSet;
 use App\Models\ProductCollection;
 use App\Models\ProductWithAttribute;
+use App\Models\ProductWithAttributeSet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -23,35 +25,52 @@ class ProductController extends Controller
 
 
         if (request()->user() == null) {
-            $result = Product::where('id', $id)->with(['attributes.sizeAttribute' => function ($query) {
-
-                $query->where('attribute_set_id', 2);
+            $result = Product::where('id', $id)->with(['sizes.sizeDetails' => function ($query) {
+                $query->where('attribute_set_id', '=', 2);
             }])->get()->toArray();
 
             if ($result != null)
                 $result[0] += ['is_wish_listed' => false];
         } else
 
-            $result = Product::where('id', $id)->with(['attributes.sizeAttribute' => function ($query) {
-
-                $query->where('attribute_set_id', 2);
+            $result = Product::where('id', $id)->with(['sizes.sizeDetails' => function ($query) {
+                $query->where('attribute_set_id', '=', 2);
             }])->get()->each(function ($items) {
 
                 $items->append('is_wish_listed');
             })->toArray();
-
 
         if ($result == null)
             return response(["available" => false], 200);
 
         else {
 
-            foreach ($result[0]['attributes'] as  $key => $value)
-                if (is_null($value['size_attribute']))
-                    unset($result[0]['attributes'][$key]);
+            // foreach ($result[0]['sizes'] as  $key => $value)
+            //     if (is_null($value['size_details']))
+            //         unset($result[0]['sizes'][$key]);
+            foreach ($result[0]['sizes'] as  $key => $value)
+                if (is_null($value['size_details']))
+                    array_splice($result[0]['sizes'], $key, 1);
+        
+
 
             return response(["available" => true, "product" =>  $result], 200);
         }
+
+
+
+        // $result = Product::join('ec_product_with_attribute_set','ec_products.id','=','ec_product_with_attribute_set.product_id'  )
+        //     ->where('ec_products.id', $id) ->where('ec_product_with_attribute_set.attribute_set_id', 2)
+        //     ->Join('ec_product_with_attribute', 'ec_product_with_attribute.product_id', '=', 'ec_product_with_attribute_set.product_id') 
+        //     ->Join('ec_product_attributes', 'ec_product_attributes.id', '=', 'ec_product_with_attribute.attribute_id') 
+        //     ->get();
+
+
+
+
+
+
+
     }
 
     public function getFlashSale()
